@@ -146,15 +146,14 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(final_df)}"), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
-            pdf_buffer = BytesIO()
-            pdf_output = pdf.output(dest='S').encode('latin1')
+            pdf_output = pdf.output(dest='S').encode('latin-1')
             pdf_buffer = BytesIO(pdf_output)
-
+ 
 
             import os
             base_name = os.path.splitext(uploaded_file.name)[0]
             output_name = f"{base_name}_receipt.pdf"
-            st.download_button("⬇️ تحميل إيصال PDF", pdf_buffer, file_name=output_name)
+            st.download_button(label="⬇️ تحميل إيصال PDF",data=pdf_buffer,file_name=output_name,mime="application/pdf")
 
     else:
         st.error("❌ لم يتم العثور على جدول يحتوي على عمود 'Qty'.")
