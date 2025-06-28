@@ -5,6 +5,32 @@ from io import BytesIO
 from fpdf import FPDF
 import arabic_reshaper
 from bidi.algorithm import get_display
+# بيانات الدخول
+VALID_USERNAME = "romany"
+VALID_PASSWORD = "1234"
+
+# حالة الدخول
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# شاشة تسجيل الدخول
+if not st.session_state.logged_in:
+    st.title("🔐 تسجيل الدخول")
+
+    with st.form("login_form"):
+        username = st.text_input("اسم المستخدم")
+        password = st.text_input("كلمة المرور", type="password")
+        login = st.form_submit_button("دخول")
+
+        if login:
+            if username == VALID_USERNAME and password == VALID_PASSWORD:
+                st.session_state.logged_in = True
+                st.success("✅ تم تسجيل الدخول بنجاح")
+                st.experimental_rerun()
+            else:
+                st.error("❌ اسم المستخدم أو كلمة المرور غير صحيحة")
+
+    st.stop()  # ⛔ وقف باقي الكود لو لسه مش مسجّل دخول
 
 st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
 st.title("د/روماني عاطف يوسف")
