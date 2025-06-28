@@ -26,7 +26,7 @@ if not st.session_state.logged_in:
             if username == VALID_USERNAME and password == VALID_PASSWORD:
                 st.session_state.logged_in = True
                 st.success("✅ تم تسجيل الدخول بنجاح")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("❌ اسم المستخدم أو كلمة المرور غير صحيحة")
 
