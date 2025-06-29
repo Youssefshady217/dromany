@@ -5,11 +5,10 @@ from io import BytesIO
 from fpdf import FPDF
 import arabic_reshaper
 from bidi.algorithm import get_display
-# بيانات الدخول
+
 VALID_USERNAME = "romany"
 VALID_PASSWORD = "1234"
 
-# حالة الدخول
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
@@ -30,7 +29,7 @@ if not st.session_state.logged_in:
             else:
                 st.error("❌ اسم المستخدم أو كلمة المرور غير صحيحة")
 
-    st.stop()  # ⛔ وقف باقي الكود لو لسه مش مسجّل دخول
+    st.stop()
 
 st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
 st.title("د/روماني عاطف يوسف")
@@ -113,10 +112,12 @@ if uploaded_file:
         if st.button("📄 توليد إيصال PDF"):
             class PDF(FPDF):
                 def header(self):
-                    self.add_font("Amiri", "", "Amiri-Regular.ttf", uni=True)
+                    pdf.add_font("Amiri", "", "Amiri-Regular.ttf", uni=True)
+                    self.add_font("Amiri", "B", "Amiri-Bold.ttf", uni=True)
                     self.set_fill_color(230, 230, 230)
-                    self.set_font("Amiri", "", 14)
-                    self.cell(0, 10, reshape_arabic("صيدلية د/ روماني عاطف يوسف"), ln=1, align="C", fill=True)
+                    self.image("logo.png", x=10, y=8, w=20)
+                    self.set_font("Amiri", "B", 14)
+                    self.cell(0, 10, reshape_arabic("صيدلية د/ روماني عاطف يوسف"), ln=1, align="C")
                     self.set_font("Amiri", "", 10)
                     self.cell(0, 10, reshape_arabic("العنوان: أسيوط - الفتح - عزبة التحرير - شارع رقم 1"), ln=1, align="C")
                     self.cell(0, 10, reshape_arabic("تليفون: 01557000365"), ln=1, align="C")
@@ -148,7 +149,7 @@ if uploaded_file:
 
             def draw_table_header():
                 pdf.set_fill_color(230, 230, 230)  # رمادي فاتح لخلفية رؤوس الأعمدة
-                pdf.set_font("Amiri", "", 12)
+                pdf.set_font("Amiri", "B", 12)
                 for i, h in enumerate(headers):
                     pdf.cell(col_widths[i], row_height, reshape_arabic(h), border=1, align="C", fill=True)
                 pdf.ln()
@@ -172,7 +173,7 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(final_df)}"), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
-            pdf_output = pdf.output(dest='S').encode('latin-1')
+            pdf_output = pdf.output(dest='S')
             pdf_buffer = BytesIO(pdf_output)
  
 
