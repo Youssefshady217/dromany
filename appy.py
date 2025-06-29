@@ -6,6 +6,9 @@ from fpdf import FPDF
 import arabic_reshaper
 from bidi.algorithm import get_display
 
+def reshape_arabic(text):
+    return get_display(arabic_reshaper.reshape(str(text)))
+
 VALID_USERNAME = "romany"
 VALID_PASSWORD = "1234"
 
@@ -33,6 +36,7 @@ if not st.session_state.logged_in:
 
 st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
 st.title("د/روماني عاطف يوسف")
+
 
 uploaded_file = st.file_uploader("📤 ارفع ملف PDF يحتوي على جدول", type=["pdf"])
 
@@ -135,7 +139,7 @@ if uploaded_file:
             pdf.set_font("Amiri", "", 11)
 
             # بيانات العميل
-            pdf.cell(0, 10, reshape_arabic("اسم العميل: "), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic("اسم العميل: " + client_name), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic("شركة التأمين: "), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic("التاريخ: "), ln=1, align="R")
             pdf.ln(5)
@@ -184,7 +188,6 @@ if uploaded_file:
 
     else:
         st.error("❌ لم يتم العثور على جدول يحتوي على عمود 'Qty'.")
-
 
 
 
