@@ -92,28 +92,14 @@ if uploaded_file:
         df.columns = df.iloc[header_row_index]
         df = df.drop(index=range(0, header_row_index + 1)).reset_index(drop=True)
         df = df[df["Status"].str.contains("Approved", na=False)]
+        df["Dis."] = pd.to_numeric(df["Dis."], errors="coerce")
+        df["Cop."] = pd.to_numeric(df["Cop."], errors="coerce")
+        df["Net"] = pd.to_numeric(df["Net"], errors="coerce")
 
         df["اسم الصنف"] = df["Name"]
-        df["سعر الوحدة"] = df["Unit"].str.extract(r"(\d+\.?\d*)").astype(float)
-
-        adjusted_quantities = []
-        for i, row in df.iterrows():
-            qty_value = str(row["Qty"])
-            if "Strip" in qty_value:
-                user_qty = st.number_input(
-                    f"🖊️ أدخل الكمية الفعلية لـ {row['اسم الصنف']}",
-                    min_value=0.0,
-                    value=float(qty_value.split("/")[0]),
-                    step=0.5,
-                    key=f"qty_input_{i}"
-                )
-                adjusted_quantities.append(user_qty)
-            else:
-                numeric_qty = pd.to_numeric(qty_value.split("/")[0], errors="coerce")
-                adjusted_quantities.append(numeric_qty)
-
-        df["الكمية"] = adjusted_quantities
-        df["سعر الكمية"] = (df["الكمية"] * df["سعر الوحدة"]).round(2)
+        df["الكمية"] = df["Qty"]
+        df["سعر الوحدة"] = df["Unit"]
+        df["سعر الكمية"] = (df["Dis."] + df["Cop."] + df["Net"]).round(2)
 
         final_df = df[["اسم الصنف", "الكمية", "سعر الوحدة", "سعر الكمية"]]
 
@@ -199,7 +185,7 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(final_df)}"), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
-            pdf_output = pdf.output(dest='S').encode('latin-1')
+            pdf_output = pdf.output(dest='S')
             pdf_buffer = BytesIO(pdf_output)
  
 
