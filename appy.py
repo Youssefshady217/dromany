@@ -60,19 +60,24 @@ if uploaded_file:
     insurance_company = ""
     dispensed_date = ""
 
+    import re
+
     for line in full_text.split("\n"):
-        if "Beneficiary Name" in line:
-            parts = line.split(":")
-            if len(parts) > 1:
-                client_name = parts[1].strip().split("/")[-1].strip()
+        if "Beneficiary Name" in line:# محاولة استخراج الاسم مباشرة باستخدام regex بعد النقطتين وبعد الشرطة المائلة
+            match = re.search(r"Beneficiary Name\s*:\s*.*?/\s*(.+)", line)
+            if match:
+                client_name = match.group(1).strip()
+                client_name = client_name[::-1]
+
+
         if "Member Of" in line:
             parts = line.split(":")
             if len(parts) > 1:
                 insurance_company = parts[1].strip()
         if "Dispensed Date" in line:
-            parts = line.split(":")
-            if len(parts) > 1:
-                dispensed_date = parts[1].strip()
+            match = re.search(r"Dispensed Date\s*:\s*(\d{2}/\d{2}/\d{4})", line)
+            if match:
+                dispensed_date = match.group(1)
 
     df = pd.DataFrame(table_data)
 
@@ -88,12 +93,27 @@ if uploaded_file:
         df = df.drop(index=range(0, header_row_index + 1)).reset_index(drop=True)
         df = df[df["Status"].str.contains("Approved", na=False)]
 
-        df["Qty"] = df["Qty"].str.extract(r"(\d+\.?\d*)").astype(float)
-        df["Unit"] = df["Unit"].str.extract(r"(\d+\.?\d*)").astype(float)
         df["اسم الصنف"] = df["Name"]
-        df["الكمية"] = df["Qty"]
-        df["سعر الوحدة"] = df["Unit"]
-        df["سعر الكمية"] = (df["Qty"] * df["Unit"]).round(2)
+        df["سعر الوحدة"] = df["Unit"].str.extract(r"(\d+\.?\d*)").astype(float)
+
+        adjusted_quantities = []
+        for i, row in df.iterrows():
+            qty_value = str(row["Qty"])
+            if "Strip" in qty_value:
+                user_qty = st.number_input(
+                    f"🖊️ أدخل الكمية الفعلية لـ {row['اسم الصنف']}",
+                    min_value=0.0,
+                    value=float(qty_value.split("/")[0]),
+                    step=0.5,
+                    key=f"qty_input_{i}"
+                )
+                adjusted_quantities.append(user_qty)
+            else:
+                numeric_qty = pd.to_numeric(qty_value.split("/")[0], errors="coerce")
+                adjusted_quantities.append(numeric_qty)
+
+        df["الكمية"] = adjusted_quantities
+        df["سعر الكمية"] = (df["الكمية"] * df["سعر الوحدة"]).round(2)
 
         final_df = df[["اسم الصنف", "الكمية", "سعر الوحدة", "سعر الكمية"]]
 
@@ -139,9 +159,11 @@ if uploaded_file:
             pdf.set_font("Amiri", "", 11)
 
             # بيانات العميل
-            pdf.cell(0, 10, reshape_arabic("اسم العميل: " + client_name), ln=1, align="R")
-            pdf.cell(0, 10, reshape_arabic("شركة التأمين: "), ln=1, align="R")
-            pdf.cell(0, 10, reshape_arabic("التاريخ: "), ln=1, align="R")
+            reshaped_name = reshape_arabic(client_name)
+            reshaped_label = reshape_arabic("اسم العميل: ")
+            pdf.cell(0, 10,reshaped_name + reshaped_label , ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic("شركة التأمين: صندوق تحسين احوال العاملين بالجامعات الحكومية"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic("التاريخ: " + dispensed_date), ln=1, align="R")
             pdf.ln(5)
 
             # رأس الجدول
