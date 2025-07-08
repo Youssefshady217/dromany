@@ -185,7 +185,7 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(final_df)}"), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
-            pdf_output = pdf.output(dest='S')
+            pdf_output = pdf.output(dest='S').encode('latin1')
             pdf_buffer = BytesIO(pdf_output)
  
 
