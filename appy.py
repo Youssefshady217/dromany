@@ -186,7 +186,11 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
             pdf_output = pdf.output(dest='S')
+            if isinstance(pdf_output, str):
+                pdf_output = pdf_output.encode('latin-1')
+
             pdf_buffer = BytesIO(pdf_output)
+            
  
 
             import os
