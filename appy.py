@@ -161,7 +161,7 @@ if uploaded_file:
             reshaped_name = reshape_arabic(client_name)
             reshaped_label = reshape_arabic("اسم العميل: ")
             pdf.cell(0, 10,reshaped_name + reshaped_label , ln=1, align="R")
-            pdf.cell(0, 10, reshape_arabic("شركة التأمين: صندوق تحسين احوال العاملين بالجامعات الحكومية"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic("شركة التأمين: " + insurance_company), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic("التاريخ: " + dispensed_date), ln=1, align="R")
             pdf.ln(5)
 
