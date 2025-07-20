@@ -35,7 +35,7 @@ if not st.session_state.logged_in:
     st.stop()
 
 st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
-st.title("د/روماني عاطف يوسف")
+st.title("د/نادر نبيل فهمي")
 
 
 uploaded_file = st.file_uploader("📤 ارفع ملف PDF يحتوي على جدول", type=["pdf"])
