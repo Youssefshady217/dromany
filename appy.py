@@ -34,7 +34,7 @@ if not st.session_state.logged_in:
 
     st.stop()
 
-st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
+st.set_page_config(page_title="صيدلية د/ نادر", layout="centered")
 st.title("د/نادر نبيل فهمي")
 
 
