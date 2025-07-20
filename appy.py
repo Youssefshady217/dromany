@@ -114,11 +114,11 @@ if uploaded_file:
         final_df = df[["اسم الصنف", "الكمية", "سعر الوحدة", "سعر الكمية"]]
 
         st.success(f"✅ تم استخراج {len(final_df)} صنف معتمد")
-        st.dataframe(final_df)
+        edited_df = st.data_editor(final_df, num_rows="dynamic", use_container_width=True)
 
         # زر تحميل Excel
         output = BytesIO()
-        final_df.to_excel(output, index=False)
+        edited_df.to_excel(output, index=False)
         output.seek(0)
 
         st.download_button(
@@ -181,7 +181,7 @@ if uploaded_file:
 
             draw_table_header()
 
-            for index, row in final_df.iterrows():
+            for index, row in edited_df.iterrows():
                 if row_count >= rows_per_page:
                     pdf.add_page()
                     draw_table_header()
@@ -195,8 +195,8 @@ if uploaded_file:
                 row_count += 1
 
             pdf.ln(5)
-            pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(final_df)}"), ln=1, align="R")
-            pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {final_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(edited_df)}"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {edited_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
             pdf_output = pdf.output(dest='S')
             if isinstance(pdf_output, str):
