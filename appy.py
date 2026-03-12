@@ -34,8 +34,8 @@ if not st.session_state.logged_in:
 
     st.stop()
 
-st.set_page_config(page_title="صيدلية د/ نادر", layout="centered")
-st.title("د/نادر نبيل فهمي")
+st.set_page_config(page_title="صيدلية د/ روماني", layout="centered")
+st.title("د/روماني عاطف يوسف")
 
 
 uploaded_file = st.file_uploader("📤 ارفع ملف PDF يحتوي على جدول", type=["pdf"])
@@ -54,6 +54,7 @@ if uploaded_file:
             for table in tables:
                 for row in table:
                     table_data.append(row)
+                    
 
     # استخراج البيانات الأساسية
     client_name = ""
@@ -84,12 +85,15 @@ if uploaded_file:
                     insurance_company = insurance_company[::-1]
                 else:
                     insurance_company = after_text
+
         if "Dispensed Date" in line:
             match = re.search(r"Dispensed Date\s*:\s*(\d{2}/\d{2}/\d{4})", line)
             if match:
                 dispensed_date = match.group(1)
 
     df = pd.DataFrame(table_data)
+    
+
 
     # محاولة تحديد رأس الجدول
     header_row_index = None
@@ -102,31 +106,34 @@ if uploaded_file:
         df.columns = df.iloc[header_row_index]
         df = df.drop(index=range(0, header_row_index + 1)).reset_index(drop=True)
         df = df[df["Status"].str.contains("Approved", na=False)]
-        df["Dis."] = pd.to_numeric(df["Dis."], errors="coerce")
-        df["Cop."] = pd.to_numeric(df["Cop."], errors="coerce")
-        df["Net"] = pd.to_numeric(df["Net"], errors="coerce")
+        df = df.fillna("")
+        
+        df["Dis."] = df["Dis."].astype(str).str.replace("\n","").str.strip()
+        df["Cop."] = df["Cop."].astype(str).str.replace("\n","").str.strip()
+        df["Net"] = df["Net"].astype(str).str.replace("\n","").str.strip()
+        
 
         df["اسم الصنف"] = df["Name"]
         df["الكمية"] = df["Qty"]
         df["سعر الوحدة"] = df["Unit"]
+        df[["Dis.","Cop.","Net"]] = df[["Dis.","Cop.","Net"]].apply(pd.to_numeric, errors="coerce")
         df["سعر الكمية"] = (df["Dis."] + df["Cop."] + df["Net"]).round(2)
 
         final_df = df[["اسم الصنف", "الكمية", "سعر الوحدة", "سعر الكمية"]]
+        
+
 
         st.success(f"✅ تم استخراج {len(final_df)} صنف معتمد")
         edited_df = st.data_editor(final_df, num_rows="dynamic", use_container_width=True)
+
 
         # زر تحميل Excel
         output = BytesIO()
         edited_df.to_excel(output, index=False)
         output.seek(0)
 
-        st.download_button(
-            label="⬇️ تحميل Excel",
-            data=output,
-            file_name="approved_meds.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+
+        
 
         # توليد PDF
         if st.button("📄 توليد إيصال PDF"):
@@ -201,7 +208,6 @@ if uploaded_file:
             pdf_output = pdf.output(dest='S')
             if isinstance(pdf_output, str):
                 pdf_output = pdf_output.encode('latin-1')
-
             pdf_buffer = BytesIO(pdf_output)
             
  
@@ -213,6 +219,7 @@ if uploaded_file:
 
     else:
         st.error("❌ لم يتم العثور على جدول يحتوي على عمود 'Qty'.")
+
 
 
 
