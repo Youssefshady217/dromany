@@ -10,7 +10,7 @@ def reshape_arabic(text):
     return get_display(arabic_reshaper.reshape(str(text)))
 
 VALID_USERNAME = "romany"
-VALID_PASSWORD = "1234"
+VALID_PASSWORD = "5678"
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -139,18 +139,19 @@ if uploaded_file:
         if st.button("📄 توليد إيصال PDF"):
             class PDF(FPDF):
                 def header(self):
+
                     pdf.add_font("Amiri", "", "Amiri-Regular.ttf", uni=True)
                     self.add_font("Amiri", "B", "Amiri-Bold.ttf", uni=True)
                     self.set_fill_color(230, 230, 230)
                     self.image("logo.png", x=10, y=8, w=20)
                     self.set_font("Amiri", "B", 14)
-                    self.cell(0, 10, reshape_arabic("صيدلية د/ نادر نبيل فهمي"), ln=1, align="C")
+                    self.cell(0, 10, reshape_arabic("صيدلية د/ روماني عاطف يوسف"), ln=1, align="C")
                     self.set_font("Amiri", "", 11)
                     self.cell(0, 10, reshape_arabic("م.ض: 01-40-181-00591-5"), ln=1, align="C")
                     self.cell(0, 10, reshape_arabic("س.ت: 94294"), ln=1, align="C")
                     self.set_font("Amiri", "", 10)
-                    self.cell(0, 10, reshape_arabic("العنوان: اسيوط - شركة فريال - شارع الامام علي"), ln=1, align="C")
-                    self.cell(0, 10, reshape_arabic("تليفون: 01211136366"), ln=1, align="C")
+                    self.cell(0, 10, reshape_arabic("العنوان: اسيوط - الفتح - عزبه التحرير - شارع رقم ١"), ln=1, align="C")
+                    self.cell(0, 10, reshape_arabic("تليفون: 01557000365"), ln=1, align="C")
                     self.ln(5)
 
                 def footer(self):
@@ -219,6 +220,7 @@ if uploaded_file:
 
     else:
         st.error("❌ لم يتم العثور على جدول يحتوي على عمود 'Qty'.")
+
 
 
 
